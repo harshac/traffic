@@ -8,7 +8,7 @@ public class Simulator {
         this.newFlow = newFlow;
     }
 
-    public int[][] getNewFlow() {
+    public int[][] getPredictedFlow() {
         return newFlow;
     }
 

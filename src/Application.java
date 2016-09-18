@@ -1,3 +1,11 @@
+import org.apache.commons.lang.StringUtils;
+import presentation.Run;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.apache.commons.lang.StringUtils.join;
+
 public class Application {
 
     public static void main(String args[]) {
@@ -26,7 +34,7 @@ public class Application {
                 {0, 0, 0, 0, 0, 110},
                 {0, 0, 0, 0, 0, 0}};
 
-        int signalTimings[][] = {
+        int defaultSignalTimings[][] = {
                 {0, 60, 0, 0, 60, 0},
                 {0, 0, 60, 60, 0, 0},
                 {0, 0, 0, 0, 0, 60},
@@ -34,33 +42,31 @@ public class Application {
                 {0, 0, 0, 0, 0, 60},
                 {0, 0, 0, 0, 0, 0}};
 
-        int[][] newTimings = new SignalController().control(currentFlow, capacity, costWithinCapacity, signalTimings);
-        Simulator simulate = Simulator.simulate(currentFlow, signalTimings, newTimings, costWithinCapacity, capacity);
-        System.out.println(" ------------- Run 1 ----------------");
-        print2D("Old Timings", signalTimings);
-        print2D("Current cost", costWithinCapacity);
-        print2D("New cost", simulate.getNewCost());
-        print2D("Current Flow", currentFlow);
-        print2D("Predicted Flow", simulate.getNewFlow());
-        print2D("New Timings", newTimings);
+        List<String> runJsons = new ArrayList<String>();
 
-        for (int i = 1; i < 11; i++) {
-            System.out.println(" ------------- Run" + (i + 1) + "----------------");
-            print2D("Old Timings", newTimings);
+        Run run = run(capacity, currentFlow, costWithinCapacity, defaultSignalTimings, defaultSignalTimings, costWithinCapacity);
+        runJsons.add(run.toString());
 
-            currentFlow = simulate.getNewFlow();
-            int[][] cost = simulate.getNewCost();
-            newTimings = new SignalController().control(currentFlow, capacity, cost, newTimings);
-            print2D("New Timings", newTimings);
-
-            simulate = Simulator.simulate(currentFlow, signalTimings, newTimings, costWithinCapacity, capacity);
-            print2D("Current cost", cost);
-            print2D("New cost", simulate.getNewCost());
-            print2D("Current Flow", currentFlow);
-            print2D("Predicted Flow", simulate.getNewFlow());
-
-
+        for (int i = 1; i < 6; i++) {
+            run = run(capacity, run.getPredictedFlow(), run.getNewCost(), run.getNewTimings(), defaultSignalTimings, costWithinCapacity);
+            runJsons.add(run.toString());
         }
+
+        StringBuilder json = new StringBuilder("[");
+        json.append(StringUtils.join(runJsons, ","));
+        json.append("]");
+        System.out.println(json.toString());
+    }
+
+    private static Run run(int[][] capacity, int[][] currentFlow, int[][] currentCost, int[][] currentTimings, int[][] defaultSignalTimings, int[][] costWithinCapacity){
+        SignalController signalController1 = new SignalController();
+        Run run = new Run(capacity, currentFlow, currentCost, currentTimings);
+        currentTimings = signalController1.control(currentFlow, capacity, currentCost, currentTimings);
+        run.setNewTimings(currentTimings);
+        Simulator simulate = Simulator.simulate(currentFlow, defaultSignalTimings, currentTimings, costWithinCapacity, capacity);
+        run.setNewCost(simulate.getNewCost());
+        run.setPredictedFlow(simulate.getPredictedFlow());
+        return run;
     }
 
     private static void print2D(String name, int[][] array) {
