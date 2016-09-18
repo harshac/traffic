@@ -1,24 +1,26 @@
-public class Simulator {
+import util.Utils;
 
-    private int[][] newFlow;
-    private int[][] newCost;
+public class Predictor {
 
-    public Simulator(int[][] newFlow, int[][] newCost) {
-        this.newCost = newCost;
-        this.newFlow = newFlow;
+    private int[][] predictedFlow;
+    private int[][] predictedCost;
+
+    public Predictor(int[][] predictedFlow, int[][] predictedCost) {
+        this.predictedCost = predictedCost;
+        this.predictedFlow = predictedFlow;
     }
 
     public int[][] getPredictedFlow() {
-        return newFlow;
+        return predictedFlow;
     }
 
-    public int[][] getNewCost() {
-        return newCost;
+    public int[][] getPredictedCost() {
+        return predictedCost;
     }
 
-    public static Simulator simulate(int currentFlow[][], int oldSignal[][], int newSignal[][], int cost[][], int capacity[][]) {
-        int newFlow[][] = Helper.clone(currentFlow);
-        int newCost[][] = Helper.clone(cost);
+    public static Predictor predict(int currentFlow[][], int oldSignal[][], int newSignal[][], int cost[][], int capacity[][]) {
+        int newFlow[][] = Utils.clone(currentFlow);
+        int newCost[][] = Utils.clone(cost);
         for (int i = 0; i < currentFlow.length; i++) {
             for (int j = 0; j < currentFlow.length; j++) {
                 if (oldSignal[i][j] > 0) {
@@ -32,7 +34,7 @@ public class Simulator {
         }
 
 
-        return new Simulator(newFlow, newCost);
+        return new Predictor(newFlow, newCost);
     }
 
 }

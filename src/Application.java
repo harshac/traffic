@@ -1,4 +1,5 @@
 import org.apache.commons.lang.StringUtils;
+import presentation.ConsolePrinter;
 import presentation.Run;
 
 import java.util.ArrayList;
@@ -42,40 +43,27 @@ public class Application {
                 {0, 0, 0, 0, 0, 60},
                 {0, 0, 0, 0, 0, 0}};
 
-        List<String> runJsons = new ArrayList<String>();
+        List<Run> runs = new ArrayList<>();
 
         Run run = run(capacity, currentFlow, costWithinCapacity, defaultSignalTimings, defaultSignalTimings, costWithinCapacity);
-        runJsons.add(run.toString());
+        runs.add(run);
 
         for (int i = 1; i < 6; i++) {
-            run = run(capacity, run.getPredictedFlow(), run.getNewCost(), run.getNewTimings(), defaultSignalTimings, costWithinCapacity);
-            runJsons.add(run.toString());
+            run = run(capacity, run.getPredictedFlow(), run.getPredictedCost(), run.getNewTimings(), defaultSignalTimings, costWithinCapacity);
+            runs.add(run);
         }
 
-        StringBuilder json = new StringBuilder("[");
-        json.append(StringUtils.join(runJsons, ","));
-        json.append("]");
-        System.out.println(json.toString());
+        ConsolePrinter.printRuns(runs);
     }
 
-    private static Run run(int[][] capacity, int[][] currentFlow, int[][] currentCost, int[][] currentTimings, int[][] defaultSignalTimings, int[][] costWithinCapacity){
+    private static Run run(int[][] capacity, int[][] currentFlow, int[][] currentCost, int[][] currentTimings, int[][] defaultSignalTimings, int[][] costWithinCapacity) {
         SignalController signalController1 = new SignalController();
         Run run = new Run(capacity, currentFlow, currentCost, currentTimings);
         currentTimings = signalController1.control(currentFlow, capacity, currentCost, currentTimings);
         run.setNewTimings(currentTimings);
-        Simulator simulate = Simulator.simulate(currentFlow, defaultSignalTimings, currentTimings, costWithinCapacity, capacity);
-        run.setNewCost(simulate.getNewCost());
+        Predictor simulate = Predictor.predict(currentFlow, defaultSignalTimings, currentTimings, costWithinCapacity, capacity);
+        run.setPredictedCost(simulate.getPredictedCost());
         run.setPredictedFlow(simulate.getPredictedFlow());
         return run;
-    }
-
-    private static void print2D(String name, int[][] array) {
-        System.out.println("\n" + name);
-        for (int i = 0; i < 6; i++) {
-            for (int j = 0; j < 6; j++) {
-                System.out.print(array[i][j] + "\t");
-            }
-            System.out.println("");
-        }
     }
 }

@@ -1,4 +1,8 @@
-public class Helper {
+package util;
+
+import java.util.ArrayList;
+
+public class Utils {
 
     public static int[][] clone(int source[][]) {
         int length = source.length;
@@ -9,6 +13,14 @@ public class Helper {
             }
         }
         return cloned;
+    }
+
+    public static ArrayList<Integer> convertToList(int[] array) {
+        ArrayList<Integer> integers = new ArrayList<Integer>();
+        for (int i : array) {
+            integers.add(i);
+        }
+        return integers;
     }
 
 }

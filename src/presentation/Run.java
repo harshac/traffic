@@ -1,7 +1,6 @@
 package presentation;
 
-import java.util.Arrays;
-
+import static presentation.ConsolePrinter.printMatrix;
 import static presentation.JsonStringBuilder.buildJsonForMatrix;
 
 public class Run {
@@ -10,7 +9,7 @@ public class Run {
     private int currentCost[][];
     private int currentTimings[][];
     private int predictedFlow[][];
-    private int newCost[][];
+    private int predictedCost[][];
     private int newTimings[][];
 
     public Run(int[][] capacity, int[][] currentFlow, int[][] currentCost, int[][] currentTimings) {
@@ -24,8 +23,8 @@ public class Run {
         this.predictedFlow = predictedFlow;
     }
 
-    public void setNewCost(int[][] newCost) {
-        this.newCost = newCost;
+    public void setPredictedCost(int[][] predictedCost) {
+        this.predictedCost = predictedCost;
     }
 
     public void setNewTimings(int[][] newTimings) {
@@ -40,8 +39,8 @@ public class Run {
         return newTimings;
     }
 
-    public int[][] getNewCost() {
-        return newCost;
+    public int[][] getPredictedCost() {
+        return predictedCost;
     }
 
     @Override
@@ -55,25 +54,34 @@ public class Run {
         stringBuilder.append(buildJsonForMatrix(currentFlow));
         stringBuilder.append(",");
 
+        stringBuilder.append("\"predictedFlow\":");
+        stringBuilder.append(buildJsonForMatrix(predictedFlow));
+        stringBuilder.append(",");
+
         stringBuilder.append("\"currentCost\":");
         stringBuilder.append(buildJsonForMatrix(currentCost));
+        stringBuilder.append(",");
+
+        stringBuilder.append("\"predictedCost\":");
+        stringBuilder.append(buildJsonForMatrix(predictedCost));
         stringBuilder.append(",");
 
         stringBuilder.append("\"currentTimings\":");
         stringBuilder.append(buildJsonForMatrix(currentTimings));
         stringBuilder.append(",");
 
-        stringBuilder.append("\"predictedFlow\":");
-        stringBuilder.append(buildJsonForMatrix(predictedFlow));
-        stringBuilder.append(",");
-
-        stringBuilder.append("\"newCost\":");
-        stringBuilder.append(buildJsonForMatrix(newCost));
-        stringBuilder.append(",");
-
         stringBuilder.append("\"newTimings\":");
         stringBuilder.append(buildJsonForMatrix(newTimings));
         stringBuilder.append("}");
         return stringBuilder.toString();
+    }
+
+    public void print(){
+        printMatrix("Current Flow", currentFlow);
+        printMatrix("Predicted Flow", predictedFlow);
+        printMatrix("Current Cost", currentCost);
+        printMatrix("Predicted Cost", predictedCost);
+        printMatrix("Current Timings", currentTimings);
+        printMatrix("New Timings", newTimings);
     }
 }

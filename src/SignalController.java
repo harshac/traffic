@@ -1,5 +1,6 @@
 import model.Node;
 import model.Path;
+import util.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,7 +19,7 @@ public class SignalController {
     }
 
     private int[][] optimizeSignalTimes(int[][] currentSignal, Map<Path, List<Path>> congestedPaths, int[][] currentFlow, int[][] capacity, int[][] cost) {
-        int newSignal[][] = Helper.clone(currentSignal);
+        int newSignal[][] = Utils.clone(currentSignal);
         for (Path path : congestedPaths.keySet()) {
             List<Path> alternatePaths = congestedPaths.get(path);
             for (Path alternatePath : alternatePaths) {
