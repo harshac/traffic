@@ -1,15 +1,20 @@
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import presentation.ConsolePrinter;
+import presentation.JsonStringBuilder;
 import presentation.Run;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.apache.commons.lang.StringUtils.join;
+import static presentation.JsonStringBuilder.buildJsonForArray;
 
 public class Application {
 
-    public static void main(String args[]) {
+    public static void main(String args[]) throws IOException {
         int capacity[][] = {
                 {0, 500, 0, 0, 1000, 0},
                 {0, 0, 700, 300, 0, 0},
@@ -54,6 +59,8 @@ public class Application {
         }
 
         ConsolePrinter.printRuns(runs);
+
+        FileUtils.writeStringToFile(new File("out/result.json"), buildJsonForArray(runs));
     }
 
     private static Run run(int[][] capacity, int[][] currentFlow, int[][] currentCost, int[][] currentTimings, int[][] defaultSignalTimings, int[][] costWithinCapacity) {
