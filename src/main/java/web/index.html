@@ -91,16 +91,12 @@
     }
 
 
-    d3.json("sampledata.json", function (data) {
-        console.log(data)
-
-        data[0].forEach(function (jsonData) {
-            var roadTrafficRatio = jsonData.flow / jsonData.capacity;
-            var roadId = jsonData.id
-            console.log("Road Traffic on " + jsonData.id + " is proportionate to " + roadTrafficRatio);
-            var linkElement = findElement(d3.selectAll(".link")[0], roadId);
-            linkElement.setAttribute("stroke-width", (2 + 2 * roadTrafficRatio));
-            setColor(linkElement, roadTrafficRatio);
+    d3.json("sampledata.json", function (runs) {
+        console.log(runs);
+        runs.forEach(function (run) {
+            console.log("start");
+            setTimeout(render(run), 5000);
+            console.log("end");
         });
 
     });
@@ -114,6 +110,17 @@
         else {
             linkElement.setAttribute("stroke", RED);
         }
+    }
+
+    function render(run) {
+        run.forEach(function (jsonData) {
+            var roadTrafficRatio = jsonData.flow / jsonData.capacity;
+            var roadId = jsonData.id
+            console.log("Road Traffic on " + jsonData.id + " is proportionate to " + roadTrafficRatio);
+            var linkElement = findElement(d3.selectAll(".link")[0], roadId);
+            linkElement.setAttribute("stroke-width", (2 + 2 * roadTrafficRatio));
+            setColor(linkElement, roadTrafficRatio);
+        });
     }
 
     function findElement(elements, id) {
