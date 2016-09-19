@@ -1,10 +1,41 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
+<head>
+    <link rel="stylesheet" href="font-awesome-4.6.3/css/font-awesome.min.css">
+</head>
 <style>
-
 
 </style>
 <body>
+<div style="border: solid black 2px;width: 150px;display: inline-block;height: 70px;padding: 12px; padding-top: 0px">
+    <h4 id="runId">Run: 1</h4>
+    <h4>Route: A <i class="fa fa-long-arrow-right" aria-hidden="true"></i> F</h4>
+</div>
+
+<div style="border: solid black 2px;width: 250px;height:80px;padding: 20px 0;display: inline-block">
+    <ul>
+        <li style="list-style-type: none">
+            <div style="display:inline-block;height:10px;width:30px;background:#008000"></div>
+            <div style="display:inline-block"> No traffic</div>
+        </li>
+
+        <li style="list-style-type: none">
+            <div style="display:inline-block;height:10px;width:30px;background:#ffd700"></div>
+            <div style="display:inline-block"> Flowing traffic</div>
+        </li>
+
+        <li style="list-style-type: none">
+            <div style="display:inline-block;height:10px;width:30px;background:#ff0000"></div>
+            <div style="display:inline-block"> Congested traffic</div>
+        </li>
+
+        <li style="list-style-type: none">
+            <div style="display:inline-block;height:10px;width:10px;background:#008000;border: 3px solid green;border-radius:10px"></div>
+            <div style="display:inline-block"> Signal time in s</div>
+        </li>
+    </ul>
+</div>
+<div></div>
 <script src="//d3js.org/d3.v3.min.js"></script>
 <script>
     var YELLOW = "#ffd700";
@@ -39,12 +70,30 @@
             .on("tick", tick)
             .start();
 
+
     var link = svg.selectAll(".link")
             .data(graph.links)
-            .enter().append("line")
+            .enter()
+            .append("g")
+            .attr("class", "link-group")
+            .append("line")
             .attr("class", "link")
-            .attr("stroke", "#0ff")
+            .attr("stroke", GREEN)
             .attr("stroke-width", 3);
+
+    var linktext = svg.selectAll(".link-group")
+            .append("text")
+            .data(graph.links)
+            .text("60s")
+            .attr("x", function (d) {
+                return d.source.x + 16 + (d.target.x - d.source.x) * 0.5;
+            })
+            .attr("y", function (d) {
+                return d.source.y + -16 + (d.target.y - d.source.y) * 0.5;
+            })
+            .attr("class", "link-text")
+            .attr("dy", "0.25em")
+            .attr("text-anchor", "middle");
 
     var node = svg.selectAll(".node")
             .data(graph.nodes)
@@ -58,7 +107,8 @@
 
 
     node.append("text")
-            .style("text-anchor", "middle");
+            .style("text-anchor", "middle")
+            .attr("dy", "0.25em");
 
 
     function tick() {
@@ -78,6 +128,17 @@
                     return d.id
                 });
 
+        linktext
+                .attr("x", function (d) {
+                    return d.source.x + 16 + (d.target.x - d.source.x) * 0.5;
+                })
+                .attr("y", function (d) {
+                    return d.source.y + -16 + (d.target.y - d.source.y) * 0.5;
+                })
+                .attr("id", function (d) {
+                    return d.id;
+                });
+
         node.attr("transform", function (d) {
             return "translate(" + d.x + "," + d.y + ")";
         })
@@ -87,19 +148,22 @@
                 .attr("fill", "#fff")
                 .text(function (d) {
                     return String.fromCharCode(65 + d.index);
-                });
+                })
+
     }
 
 
-    d3.json("sampledata.json", function (runs) {
-        console.log(runs);
-        runs.forEach(function (run) {
-            console.log("start");
-            setTimeout(render(run), 5000);
-            console.log("end");
+    function render(run) {
+        run.forEach(function (jsonData) {
+            var roadTrafficRatio = jsonData.flow / jsonData.capacity;
+            var roadId = jsonData.id
+            var linkElement = d3.selectAll(".link[id='" + roadId + "']")[0][0];
+            linkElement.setAttribute("stroke-width", (2 + 2 * roadTrafficRatio));
+            var textElement = d3.selectAll(".link-text[id='" + roadId + "']")[0][0];
+            textElement.textContent = jsonData.signalTime + "s";
+            setColor(linkElement, roadTrafficRatio);
         });
-
-    });
+    }
 
     function setColor(linkElement, roadTrafficRatio) {
         if (roadTrafficRatio > 0.5 && roadTrafficRatio < 1) {
@@ -112,17 +176,6 @@
         }
     }
 
-    function render(run) {
-        run.forEach(function (jsonData) {
-            var roadTrafficRatio = jsonData.flow / jsonData.capacity;
-            var roadId = jsonData.id
-            console.log("Road Traffic on " + jsonData.id + " is proportionate to " + roadTrafficRatio);
-            var linkElement = findElement(d3.selectAll(".link")[0], roadId);
-            linkElement.setAttribute("stroke-width", (2 + 2 * roadTrafficRatio));
-            setColor(linkElement, roadTrafficRatio);
-        });
-    }
-
     function findElement(elements, id) {
         var selectedElement;
         elements.forEach(function (element) {
@@ -133,4 +186,23 @@
         })
         return selectedElement;
     }
+
+    d3.json("sampledata.json", function (runs) {
+        d3.selectAll(".link-text[id='1-2']")[0][0].setAttribute("font-size","25px");
+        d3.selectAll(".link-text[id='1-3']")[0][0].setAttribute("font-size","25px");
+        (function next(counter, maxLoops) {
+            // break if maxLoops has been reached
+            if (counter++ > maxLoops) return;
+            d3.select("[id='runId']")[0][0].textContent = "Run: " + counter;
+            setTimeout(function () {
+                console.log(counter);
+
+                render(runs[counter]);
+
+                // call next() recursively
+                next(counter, maxLoops);
+            }, 5000);
+        })(1, runs.length);
+
+    });
 </script>

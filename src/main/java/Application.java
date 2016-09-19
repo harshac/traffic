@@ -53,7 +53,7 @@ public class Application {
         Run run = run(capacity, currentFlow, costWithinCapacity, defaultSignalTimings, defaultSignalTimings, costWithinCapacity);
         runs.add(run);
 
-        for (int i = 1; i < 6; i++) {
+        for (int i = 1; i < 9; i++) {
             run = run(capacity, run.getPredictedFlow(), run.getPredictedCost(), run.getNewTimings(), defaultSignalTimings, costWithinCapacity);
             runs.add(run);
         }
