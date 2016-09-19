@@ -2,10 +2,6 @@
 <meta charset="utf-8">
 <style>
 
-    .link {
-        stroke: #000;
-    }
-
     .node {
         fill: #ccc;
         stroke: #000;
@@ -15,7 +11,9 @@
 <body>
 <script src="//d3js.org/d3.v3.min.js"></script>
 <script>
-
+    var YELLOW = "#ffd700";
+    var RED = "#ff0000";
+    var GREEN = "#008000";
     var graph = {
         nodes: d3.range(6).map(Object),
         links: [
@@ -25,8 +23,7 @@
             {source: 2, target: 5, id: "2-5"},
             {source: 3, target: 5, id: "3-5"},
             {source: 4, target: 5, id: "4-5"},
-            {source: 0, target: 4, id: "0-4"},
-
+            {source: 0, target: 4, id: "0-4"}
         ]
     };
 
@@ -50,6 +47,7 @@
             .data(graph.links)
             .enter().append("line")
             .attr("class", "link")
+            .attr("stroke", "#0ff")
             .attr("stroke-width", 3);
 
     var node = svg.selectAll(".node")
@@ -86,13 +84,24 @@
 
     d3.json("sampledata.json", function (data) {
         console.log(data)
-        data1 = data;
+        data1 = data[0];
 
-        data.forEach(function (jsonData) {
-            var roadTrafficRatio=(5 + (2 * jsonData.flow / jsonData.capacity));
-            console.log("Road Traffic on "+jsonData.id+ " is proportionate to "+roadTrafficRatio);
-            findElement(d3.selectAll(".link")[0], "0-1")
-                    .setAttribute("stroke-width", roadTrafficRatio);
+        data1.forEach(function (jsonData) {
+            var roadTrafficRatio = jsonData.flow / jsonData.capacity;
+            var roadId = jsonData.id
+            console.log("Road Traffic on " + jsonData.id + " is proportionate to " + roadTrafficRatio);
+            var linkElement = findElement(d3.selectAll(".link")[0], roadId);
+            linkElement.setAttribute("stroke-width", (2 + 2 * roadTrafficRatio));
+            if (roadTrafficRatio > 0.5 && roadTrafficRatio < 1) {
+                linkElement.setAttribute("stroke", YELLOW);
+            } else if (roadTrafficRatio < 0.5) {
+                linkElement.setAttribute("stroke", GREEN);
+            }
+            else {
+                linkElement.setAttribute("stroke", RED);
+            }
+
+
         });
 
     });

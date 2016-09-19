@@ -21,34 +21,32 @@ public class JsonStringBuilder {
         return json.toString();
     }
 
-    public static String buildJsonForMatrix(int array[][]) {
-        ArrayList<String> edges = new ArrayList<>();
-        StringBuilder stringBuilder = new StringBuilder("[");
-        for (int i = 0; i < array.length; i++) {
-            for(int j=0; j< array.length; j++){
-                if(array[i][j] > 0){
-                    edges.add(buildJsonForEdge(i, j, array[i][j]));
-                }
-            }
-        }
-        stringBuilder.append(join(edges, SEPARATOR));
-        stringBuilder.append("]");
-        return stringBuilder.toString();
-    }
-
-    private static String buildJsonForRow(int[] array) {
-        StringBuilder stringBuilder = new StringBuilder("[");
-        stringBuilder.append(join(convertToList(array), SEPARATOR));
-        stringBuilder.append("]");
-        return stringBuilder.toString();
-    }
-
-    private static String buildJsonForEdge(int startNode, int endNode, int value) {
+    public static String buildJsonForEdge(int startNode, int endNode, int capacity, int flow, int time) {
         StringBuilder stringBuilder = new StringBuilder("{");
-        stringBuilder.append(format("\"startNode\": %s,", startNode));
-        stringBuilder.append(format("\"endNode\": %s,", endNode));
-        stringBuilder.append(format("\"value\": %s", value));
+        stringBuilder.append(jsonKeyValue("\"id\"", String.format("\"%s-%s\"", startNode, endNode)));
+        stringBuilder.append(SEPARATOR);
+        stringBuilder.append(jsonKeyValue("\"capacity\"", capacity));
+        stringBuilder.append(SEPARATOR);
+        stringBuilder.append(jsonKeyValue("\"flow\"", flow));
+        stringBuilder.append(SEPARATOR);
+        stringBuilder.append(jsonKeyValue("\"signalTime\"", time));
         stringBuilder.append("}");
         return stringBuilder.toString();
     }
+
+    private static String jsonKeyValue(String key, String value) {
+        StringBuilder stringBuilder = new StringBuilder(key);
+        stringBuilder.append(":");
+        stringBuilder.append(value);
+        return stringBuilder.toString();
+    }
+
+    private static String jsonKeyValue(String key, int value) {
+        StringBuilder stringBuilder = new StringBuilder(key);
+        stringBuilder.append(":");
+        stringBuilder.append(value);
+        return stringBuilder.toString();
+    }
 }
+
+

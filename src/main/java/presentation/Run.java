@@ -1,7 +1,12 @@
+
 package presentation;
 
+import org.apache.commons.lang.StringUtils;
+
+import java.util.ArrayList;
+
 import static presentation.ConsolePrinter.printMatrix;
-import static presentation.JsonStringBuilder.buildJsonForMatrix;
+import static presentation.JsonStringBuilder.buildJsonForEdge;
 
 public class Run {
     private int capacity[][];
@@ -45,38 +50,21 @@ public class Run {
 
     @Override
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder("{");
-        stringBuilder.append("\"capacity\":");
-        stringBuilder.append(buildJsonForMatrix(capacity));
-        stringBuilder.append(",");
-
-        stringBuilder.append("\"currentFlow\":");
-        stringBuilder.append(buildJsonForMatrix(currentFlow));
-        stringBuilder.append(",");
-
-        stringBuilder.append("\"predictedFlow\":");
-        stringBuilder.append(buildJsonForMatrix(predictedFlow));
-        stringBuilder.append(",");
-
-        stringBuilder.append("\"currentCost\":");
-        stringBuilder.append(buildJsonForMatrix(currentCost));
-        stringBuilder.append(",");
-
-        stringBuilder.append("\"predictedCost\":");
-        stringBuilder.append(buildJsonForMatrix(predictedCost));
-        stringBuilder.append(",");
-
-        stringBuilder.append("\"currentTimings\":");
-        stringBuilder.append(buildJsonForMatrix(currentTimings));
-        stringBuilder.append(",");
-
-        stringBuilder.append("\"newTimings\":");
-        stringBuilder.append(buildJsonForMatrix(newTimings));
-        stringBuilder.append("}");
+        StringBuilder stringBuilder = new StringBuilder("[");
+        ArrayList<String> edgeJsons = new ArrayList<>();
+        for (int i = 0; i < capacity.length; i++) {
+            for (int j = 0; j < capacity.length; j++) {
+                if (capacity[i][j] > 0) {
+                    edgeJsons.add(buildJsonForEdge(i, j, capacity[i][j], currentFlow[i][j], currentTimings[i][j]));
+                }
+            }
+        }
+        stringBuilder.append(StringUtils.join(edgeJsons, ","));
+        stringBuilder.append("]");
         return stringBuilder.toString();
     }
 
-    public void print(){
+    public void print() {
         printMatrix("Current Flow", currentFlow);
         printMatrix("Predicted Flow", predictedFlow);
         printMatrix("Current Cost", currentCost);
@@ -85,3 +73,4 @@ public class Run {
         printMatrix("New Timings", newTimings);
     }
 }
+
