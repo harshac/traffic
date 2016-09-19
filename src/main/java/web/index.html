@@ -85,12 +85,15 @@
 
 
     d3.json("sampledata.json", function (data) {
-        console.log( data)
-        data1=data;
-//        (d3.select("#0-1")).attr("stroke-width", 5);
-        var element = findElement(d3.selectAll(".link")[0], "0-1");
-        element.setAttribute("stroke-width", 8);
-        console.log(element);
+        console.log(data)
+        data1 = data;
+
+        data.forEach(function (jsonData) {
+            var roadTrafficRatio=(5 + (2 * jsonData.flow / jsonData.capacity));
+            console.log("Road Traffic on "+jsonData.id+ " is proportionate to "+roadTrafficRatio);
+            findElement(d3.selectAll(".link")[0], "0-1")
+                    .setAttribute("stroke-width", roadTrafficRatio);
+        });
 
     });
 
