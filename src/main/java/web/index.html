@@ -2,10 +2,6 @@
 <meta charset="utf-8">
 <style>
 
-    .node {
-        fill: #ccc;
-        stroke: #000;
-    }
 
 </style>
 <body>
@@ -52,9 +48,18 @@
 
     var node = svg.selectAll(".node")
             .data(graph.nodes)
-            .enter().append("circle")
+            .enter().append("g")
             .attr("class", "node")
-            .attr("r", 7.5);
+            .call(force.drag);
+
+    node.append("circle")
+            .attr("r", 15)
+            .attr("fill", "#000");
+
+
+    node.append("text")
+            .style("text-anchor", "middle");
+
 
     function tick() {
         link.attr("x1", function (d) {
@@ -73,38 +78,43 @@
                     return d.id
                 });
 
-        node.attr("cx", function (d) {
-            return d.x;
+        node.attr("transform", function (d) {
+            return "translate(" + d.x + "," + d.y + ")";
         })
-                .attr("cy", function (d) {
-                    return d.y;
+
+        node.selectAll("text")
+                .attr("stroke", "#fff")
+                .attr("fill", "#fff")
+                .text(function (d) {
+                    return String.fromCharCode(65 + d.index);
                 });
     }
 
 
     d3.json("sampledata.json", function (data) {
         console.log(data)
-        data1 = data[0];
 
-        data1.forEach(function (jsonData) {
+        data[0].forEach(function (jsonData) {
             var roadTrafficRatio = jsonData.flow / jsonData.capacity;
             var roadId = jsonData.id
             console.log("Road Traffic on " + jsonData.id + " is proportionate to " + roadTrafficRatio);
             var linkElement = findElement(d3.selectAll(".link")[0], roadId);
             linkElement.setAttribute("stroke-width", (2 + 2 * roadTrafficRatio));
-            if (roadTrafficRatio > 0.5 && roadTrafficRatio < 1) {
-                linkElement.setAttribute("stroke", YELLOW);
-            } else if (roadTrafficRatio < 0.5) {
-                linkElement.setAttribute("stroke", GREEN);
-            }
-            else {
-                linkElement.setAttribute("stroke", RED);
-            }
-
-
+            setColor(linkElement, roadTrafficRatio);
         });
 
     });
+
+    function setColor(linkElement, roadTrafficRatio) {
+        if (roadTrafficRatio > 0.5 && roadTrafficRatio < 1) {
+            linkElement.setAttribute("stroke", YELLOW);
+        } else if (roadTrafficRatio < 0.5) {
+            linkElement.setAttribute("stroke", GREEN);
+        }
+        else {
+            linkElement.setAttribute("stroke", RED);
+        }
+    }
 
     function findElement(elements, id) {
         var selectedElement;
@@ -116,5 +126,4 @@
         })
         return selectedElement;
     }
-    var data1;
 </script>
