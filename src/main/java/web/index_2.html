@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+
+    .node {
+        stroke: #fff;
+        stroke-width: 1.5px;
+    }
+
+    .link {
+        stroke: #999;
+        stroke-opacity: .6;
+    }
+
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="dijkstra.js"></script>
+<script>
+
+    var width = 960,
+            height = 500;
+
+    var color = d3.scale.category20();
+
+    var force = d3.layout.force()
+            .charge(-120) //for repelling
+            .linkDistance(30)
+            .size([width, height]);
+
+    var svg = d3.select("body").append("svg")
+            .attr("width", width)
+            .attr("height", height);
+    d3.tsv("cities1.tsv", function(error, data) {
+
+        var nodes = [], nodesByName = {}, links = [];
+
+        //to add all nodes in the system
+        function addNodeByName(fullname) {
+            var name = fullname.split(',')[0];
+            if (!nodesByName[name]) {
+                var node = {"name":name, "links":[]}
+                nodesByName[name] = node;
+                nodes.push(node);
+                return node;
+            }
+            else
+                return nodesByName[name];
+        }
+        data.forEach(function(d) {
+            for(k in d) {
+                console.log("i am h" + k);
+            }
+
+        });
+
+
+    })
+    </script>
