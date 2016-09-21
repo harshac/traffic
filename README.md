@@ -11,3 +11,6 @@ nodes=junctions
 
 The visualizer is built using d3 javascript library.
 Run the index.html to see visualizations of the traffic state.
+
+
+Built with Java and D3 javascript library.
