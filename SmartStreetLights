@@ -1,0 +1,114 @@
+//#Adruino Board. Connects 4 LEDS and 2 motion sensors and turns on/off the streetlights based on the obstacle/proximity sensor
+
+
+int STREETLIGHT_1 = 13; // Use the onboard Uno STREETLIGHT_1(StreetLight)
+int STREETLIGHT_2 = 11;
+int STREETLIGHT_3 = 9;
+int STREETLIGHT_4 = 5;
+
+int isObstaclePin = 7;  // This is our input pin
+int isObstaclePin2 = 6; // this is our 2nd obstacle pin
+int isObstacle = HIGH;  // HIGH MEANS NO OBSTACLE
+int isObstacle2 = HIGH;
+
+
+//traffic led pins
+int greenled = 8;
+int yellowled = 9;
+int redled = 10;
+
+void setup() {
+  obstacleDetectionSetup();
+  //trafficLightSetup()
+}
+
+void loop() {
+
+  autoStreetLights();
+
+  //trafficLights();
+
+}
+
+void obstacleDetectionSetup() {
+  pinMode(STREETLIGHT_1, OUTPUT);
+  pinMode(STREETLIGHT_2, OUTPUT);
+  pinMode(STREETLIGHT_3, OUTPUT);
+  pinMode(isObstaclePin, INPUT);
+
+  pinMode(STREETLIGHT_4, OUTPUT);
+  pinMode(isObstaclePin2, INPUT);
+  Serial.begin(9600);
+
+}
+
+void autoStreetLights()
+{
+  isObstacle = digitalRead(isObstaclePin);
+
+  isObstacle2 = digitalRead(isObstaclePin2);
+
+  //turn on all lights if you detect motion on both the sensors
+  if (digitalRead(isObstaclePin) == LOW && digitalRead(isObstaclePin2) == LOW)
+  {
+    digitalWrite(STREETLIGHT_1, HIGH); //turns on the streetlight
+    digitalWrite(STREETLIGHT_2, HIGH); //turns on the streetlight
+    digitalWrite(STREETLIGHT_3, HIGH); //turns on the streetlight
+    digitalWrite(STREETLIGHT_4, HIGH); //turns on the streetlight
+
+    Serial.println("@1 & @2 I see someone coming near me!");
+  } else {
+    
+    //#first streetlight detects motion
+    if (digitalRead(isObstaclePin) == LOW)
+    {
+      digitalWrite(STREETLIGHT_1, HIGH); //turns on the streetlight
+      digitalWrite(STREETLIGHT_2, HIGH); //turns on the streetlight
+      digitalWrite(STREETLIGHT_3, HIGH); //turns on the streetlight
+      
+      //digitalWrite(STREETLIGHT_4, LOW); //turn off the last light
+      Serial.println("StreetLight1: I see someone coming near me!");
+    }
+      //#second streetlight detects motion
+    else if (digitalRead(isObstaclePin2) == LOW)
+    {
+      digitalWrite(STREETLIGHT_2, HIGH); //turns on the streetlight
+      digitalWrite(STREETLIGHT_3, HIGH); //turns on the streetlight
+      digitalWrite(STREETLIGHT_4, HIGH); //turns on the streetlight
+
+         //  digitalWrite(STREETLIGHT_1, LOW); //turn off the first light
+
+
+      Serial.println("StreetLight2: I see someone coming near me! ");
+    }
+    //First streetlight sees no motion
+    if (digitalRead(isObstaclePin) == HIGH) {
+      Serial.println("#StreetLight1 I don't see anyone in vicinity. Time To sleep! in 1 seconds");
+      delay(2000);
+      digitalWrite(STREETLIGHT_1, LOW);
+//Also streetlight 2 does not detect motions
+      if (digitalRead(isObstaclePin2) == HIGH) {
+        Serial.println("StreeLight2:I don't see anyone in vicinity. Time To sleep! in 1 seconds");
+        delay(900);
+        digitalWrite(STREETLIGHT_2, LOW);
+        delay(900);
+        digitalWrite(STREETLIGHT_3, LOW);
+        delay(900);
+        digitalWrite(STREETLIGHT_4, LOW);
+      }else{
+        digitalWrite(STREETLIGHT_1, LOW);
+      }
+
+    }
+    else if (digitalRead(isObstaclePin2) == HIGH)
+    {
+      Serial.println("#StreeLight2:I don't see anyone in vicinity. Time To sleep! in 1 seconds");
+      delay(1000);
+      digitalWrite(STREETLIGHT_4, LOW);
+    }
+  
+  }
+
+
+}
+
